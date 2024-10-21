@@ -3,43 +3,49 @@ import { Coverage } from "./coverage-system/coverage";
 import { Config } from "./extension/config";
 import { Gutters } from "./extension/gutters";
 import { StatusBarToggler } from "./extension/statusbartoggler";
+import { FolderDecoration } from "./extension/folderDecoration";
 
 export function activate(context: vscode.ExtensionContext) {
     const outputChannel = vscode.window.createOutputChannel("coverage-gutters");
     const configStore = new Config(context);
     const statusBarToggler = new StatusBarToggler(configStore);
     const coverage = new Coverage(configStore);
+    const folderDecoration = new FolderDecoration();
+
     const gutters = new Gutters(
         configStore,
         coverage,
         outputChannel,
-        statusBarToggler,
+        statusBarToggler
     );
 
     const previewCoverageReport = vscode.commands.registerCommand(
         "coverage-gutters.previewCoverageReport",
-        gutters.previewCoverageReport.bind(gutters),
+        gutters.previewCoverageReport.bind(gutters)
     );
     const display = vscode.commands.registerCommand(
         "coverage-gutters.displayCoverage",
-        gutters.displayCoverageForActiveFile.bind(gutters),
+        gutters.displayCoverageForActiveFile.bind(gutters)
     );
     const toggle = vscode.commands.registerCommand(
         "coverage-gutters.toggleCoverage",
-        gutters.toggleCoverageForActiveFile.bind(gutters),
+        gutters.toggleCoverageForActiveFile.bind(gutters)
     );
     const watch = vscode.commands.registerCommand(
         "coverage-gutters.watchCoverageAndVisibleEditors",
-        gutters.watchCoverageAndVisibleEditors.bind(gutters),
+        gutters.watchCoverageAndVisibleEditors.bind(gutters)
     );
     const removeWatch = vscode.commands.registerCommand(
         "coverage-gutters.removeWatch",
-        gutters.removeWatch.bind(gutters),
+        gutters.removeWatch.bind(gutters)
     );
     const remove = vscode.commands.registerCommand(
         "coverage-gutters.removeCoverage",
-        gutters.removeCoverageForActiveFile.bind(gutters),
+        gutters.removeCoverageForActiveFile.bind(gutters)
     );
+
+    const folderDeorationProvider =
+        vscode.window.registerFileDecorationProvider(folderDecoration);
 
     context.subscriptions.push(previewCoverageReport);
     context.subscriptions.push(remove);
@@ -49,4 +55,5 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(removeWatch);
     context.subscriptions.push(gutters);
     context.subscriptions.push(outputChannel);
+    context.subscriptions.push(folderDeorationProvider);
 }
